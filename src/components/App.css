@@ -1,3 +1,8 @@
 footer{
   font-size: x-small;
 }
+
+.map-div{
+  width: 100%;
+  height: 99vh;
+}

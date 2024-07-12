@@ -1,13 +1,13 @@
 import React from 'react';
-import { Map } from './Map';
+import { OurGoogleMap } from './OurGoogleMap';
 import './App.css';
 
-const App=()=> {
+const App=()=> {  
   return (
     <div id='appDiv'>
       <h1>GPS Navigator hepler tool</h1>
-      <Map/>  
-      <footer>version: {process.env.REACT_APP_VERSION}</footer>
+      <OurGoogleMap/>  
+      <footer>version:{process.env.REACT_APP_VERSION}</footer>
     </div>
     
   );
