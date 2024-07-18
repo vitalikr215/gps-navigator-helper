@@ -1,0 +1,63 @@
+﻿<?xml version="1.0" encoding="UTF-8"?>
+<gpx xmlns="http://www.topografix.com/GPX/1/1" xmlns:gpxtpx="http://www.garmin.com/xmlschemas/TrackPointExtension/v1" xmlns:gpxx="http://www.garmin.com/xmlschemas/GpxExtensions/v3" xmlns:wptx1="http://www.garmin.com/xmlschemas/WaypointExtension/v1" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" creator="eTrex 10" version="1.1" xsi:schemaLocation="http://www.topografix.com/GPX/1/1 http://www.topografix.com/GPX/1/1/gpx.xsd http://www.garmin.com/xmlschemas/GpxExtensions/v3 http://www8.garmin.com/xmlschemas/GpxExtensionsv3.xsd http://www.garmin.com/xmlschemas/WaypointExtension/v1 http://www8.garmin.com/xmlschemas/WaypointExtensionv1.xsd http://www.garmin.com/xmlschemas/TrackPointExtension/v1 http://www.garmin.com/xmlschemas/TrackPointExtensionv1.xsd">
+  <metadata>
+    <link href="http://www.garmin.com">
+      <text>Garmin International</text>
+    </link>
+    <time>2020-03-13T10:31:39</time>
+  </metadata>
+  <wpt lat="48.407651" lon="35.204222" xmlns="">
+    <time>2020-03-13T10:31:39</time>
+    <name>1Povorot</name>
+    <cmt />
+    <sym>Flag, Blue</sym>
+  </wpt>
+  <wpt lat="48.444035" lon="35.192855" xmlns="">
+    <time>2020-03-13T10:32:39</time>
+    <name>1Cementry</name>
+    <cmt />
+    <sym>Flag, Blue</sym>
+  </wpt>
+  <wpt lat="48.456202" lon="35.171202" xmlns="">
+    <time>2020-03-13T10:33:39</time>
+    <name>1Kurgan</name>
+    <cmt />
+    <sym>Flag, Blue</sym>
+  </wpt>
+  <wpt lat="48.459719" lon="35.169456" xmlns="">
+    <time>2020-03-13T10:34:39</time>
+    <name>1Povorot2</name>
+    <cmt />
+    <sym>Flag, Blue</sym>
+  </wpt>
+  <wpt lat="48.440989" lon="35.156895" xmlns="">
+    <time>2020-03-13T10:35:39</time>
+    <name>1ExitPovorot</name>
+    <cmt />
+    <sym>Flag, Blue</sym>
+  </wpt>
+  <wpt lat="48.451700" lon="35.147604" xmlns="">
+    <time>2020-03-13T10:36:39</time>
+    <name>1QuaryView</name>
+    <cmt />
+    <sym>Flag, Blue</sym>
+  </wpt>
+  <wpt lat="48.439431" lon="35.134000" xmlns="">
+    <time>2020-03-13T10:37:39</time>
+    <name>1ShemBridge</name>
+    <cmt />
+    <sym>Flag, Blue</sym>
+  </wpt>
+  <wpt lat="48.442907" lon="35.130771" xmlns="">
+    <time>2020-03-13T10:38:39</time>
+    <name>1Yaroslavni</name>
+    <cmt />
+    <sym>Flag, Blue</sym>
+  </wpt>
+  <wpt lat="48.445633" lon="35.130610" xmlns="">
+    <time>2020-03-13T10:39:39</time>
+    <name>1HighWayExit</name>
+    <cmt />
+    <sym>Flag, Blue</sym>
+  </wpt>
+</gpx>

@@ -1,4 +1,4 @@
-export class MapPoint{
-  key: string;
+export interface MapPoint{
+  key?: string;
   location: google.maps.LatLngLiteral;
 }
