@@ -1,49 +1,21 @@
 import React, { ReactNode } from 'react';
 import { OurGoogleMap } from './OurGoogleMap';
 import './App.css';
-import { MyMapProps } from '../props/MyMapProps';
 import { MapPoint } from '../entities/MapPoint';
-import { CoordinatesHelper } from '../coordinates/CoordinatesHelper';
 import { AnyAction, Dispatch } from 'redux';
 import { connect } from "react-redux";
 import { StoreState } from '..';
 
 export interface FetchAction {
   payload: MapPoint[],
-  type: string
+  type: ActionTypes.FETCH
 }
 
+export enum ActionTypes{
+  FETCH
+}
 
-
-/*export const fetchPoints = ()=>{
-  return async (dispatch: Dispatch) =>{
-    const response =  await fetch('testdata/Only-points.gpx')
-    .then(r=> r.text())
-    .then(text => {
-      const parser = new DOMParser();
-      const doc = parser.parseFromString(text, "application/xml");
-      const wptTags = doc.querySelectorAll('wpt');
-
-      let points: MapPoint[]= [];
-      wptTags.forEach(tag => {
-        points.push(
-          {
-            key: tag.querySelector('name').textContent || '',
-            location: {
-              lat: parseFloat(tag.getAttribute('lat')),
-              lng:parseFloat(tag.getAttribute('lon'))
-            }
-          });
-      return points;
-      });
-    dispatch<FetchTodosAction>({
-      type: 'Fetch',
-      payload: response
-    });
-  });
-*/
-
-function fetchPoints(file: string): Promise<MapPoint[]> {
+function fetchPointsFromFile(file: string): Promise<MapPoint[]> {
   return fetch(file)
     .then(response => response.text())
     .then(text => {
@@ -67,12 +39,12 @@ function fetchPoints(file: string): Promise<MapPoint[]> {
     });
 }
 
-export const fetchPoints1 = (fileName: string)=>{
+export const fetchPoints = (fileName: string)=>{
   return async (dispatch: Dispatch<AnyAction>) =>{
-    const points = await fetchPoints(fileName);
+    const points = await fetchPointsFromFile(fileName);
     dispatch<FetchAction>({
       payload: points,
-      type: 'fetch'
+      type: ActionTypes.FETCH
     });
   };
 };
@@ -90,7 +62,7 @@ class _App extends React.Component<AppProps, AppState>{
   constructor(props: AppProps){
     super(props);
     this.state = {fetching: false};
-    this.props.fetchPoints();
+    this.props.fetchPoints('/testdata/Only-points.gpx');
   }
   
   render(): ReactNode {

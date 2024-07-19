@@ -4,8 +4,13 @@ import { MapPoint } from "../entities/MapPoint";
 import { MyMapProps } from "../props/MyMapProps";
 import { Polyline } from "./Polyline";
 
+function getCenter(points: MapPoint[]): MapPoint{
+  return points[Math.round(points.length/2)];
+}
+
 export const OurGoogleMap: React.FC<MyMapProps> = ({locations, drawRoute})=>{
-  const defaultProps ={
+  
+  let defaultProps ={
     center: {
       lat: 48.47555614,
       lng: 34.73800501
@@ -27,6 +32,13 @@ export const OurGoogleMap: React.FC<MyMapProps> = ({locations, drawRoute})=>{
       </>
     );
   };
+  
+  //calculate center coordinates based on existing points
+  if (locations){
+    const center = getCenter(locations);
+    defaultProps.center.lat = center.location.lat;
+    defaultProps.center.lng = center.location.lng;
+  }
 
   return(<div className="map-div">
     <APIProvider apiKey={apiKey}>
