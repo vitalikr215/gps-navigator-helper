@@ -14,7 +14,7 @@ export const pointsReducer = (state: MapPoint[]=[], action: FetchAction) :MapPoi
     case ActionTypes.FETCH:
       return action.payload;   
     default:
-      return null;
+      return [] as MapPoint[];
   }
 }
 
