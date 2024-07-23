@@ -7,6 +7,7 @@ import { connect } from "react-redux";
 import { StoreState } from '..';
 import { PointsHelper } from '../helpers/PointsHelper';
 import { MyMapProps } from '../props/MyMapProps';
+import { start } from 'repl';
 
 export interface FetchAction {
   payload: MyMapProps,
@@ -22,7 +23,8 @@ function fetchPointsFromFile(file: string): Promise<MyMapProps> {
     .then(response => response.text())
     .then(text => {
        let points: MapPoint[] =[];
-       let pointsInfo: MyMapProps = {locations:[], drawRoute: false};
+       let pointsInfo: MyMapProps = {locations:[], drawRoute: false, routeSegments:[]
+        , segmentsStartEndPoints:[]};
 
        const parser = new DOMParser();
        const doc = parser.parseFromString(text, "application/xml");
@@ -41,6 +43,10 @@ function fetchPointsFromFile(file: string): Promise<MyMapProps> {
         pointsInfo.drawRoute = true;
        }
        pointsInfo.locations = points;
+
+       //mock route segments
+       pointsInfo.routeSegments = [{start:0, end:20}, {start:21, end: 40}, {start: 41, end:60}];
+       pointsInfo.segmentsStartEndPoints= [points[0], points[20], points[21], points[40],points[41], points[60]];
 
        return pointsInfo;
     });
@@ -95,7 +101,10 @@ class _App extends React.Component<AppProps, AppState>{
         <input type="file" id="pointsFile" name="pointsFile" ref={this.fileInput} accept=".gpx" />
         <button>Get points</button>
       </form>
-      <OurGoogleMap locations={this.props.pointsInfo.locations} drawRoute={this.props.pointsInfo.drawRoute} />
+      <OurGoogleMap locations={this.props.pointsInfo.locations} 
+        drawRoute={this.props.pointsInfo.drawRoute} 
+        routeSegments={this.props.pointsInfo.routeSegments}
+        segmentsStartEndPoints={this.props.pointsInfo.segmentsStartEndPoints}/>
       <footer>version:{process.env.REACT_APP_VERSION}</footer>
       </div>
     );
