@@ -4,22 +4,24 @@ import { Reducer, applyMiddleware, combineReducers, createStore } from 'redux';
 import { MapPoint } from './entities/MapPoint';
 import { thunk } from 'redux-thunk';
 import { Provider } from 'react-redux';
+import { MyMapProps } from "./props/MyMapProps";
 
 export interface StoreState{
-  points: MapPoint[];
+  pointsInfo: MyMapProps;
 }
 
-export const pointsReducer = (state: MapPoint[]=[], action: FetchAction) :MapPoint[]=>{
+export const pointsReducer = (state: MyMapProps, action: FetchAction) :MyMapProps=>{
   switch (action.type) {
     case ActionTypes.FETCH:
       return action.payload;   
     default:
-      return [] as MapPoint[];
+      const defaultInfo: MyMapProps = {locations: [], drawRoute: false};
+      return defaultInfo;
   }
 }
 
 export const reducers = combineReducers<StoreState>({
-  points: pointsReducer
+  pointsInfo: pointsReducer
 });
 
 

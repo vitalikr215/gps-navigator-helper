@@ -5,9 +5,11 @@ import { MapPoint } from '../entities/MapPoint';
 import { AnyAction, Dispatch } from 'redux';
 import { connect } from "react-redux";
 import { StoreState } from '..';
+import { PointsHelper } from '../helpers/PointsHelper';
+import { MyMapProps } from '../props/MyMapProps';
 
 export interface FetchAction {
-  payload: MapPoint[],
+  payload: MyMapProps,
   type: ActionTypes.FETCH
 }
 
@@ -15,42 +17,47 @@ export enum ActionTypes{
   FETCH
 }
 
-function fetchPointsFromFile(file: string): Promise<MapPoint[]> {
+function fetchPointsFromFile(file: string): Promise<MyMapProps> {
   return fetch(file)
     .then(response => response.text())
     .then(text => {
-       const points: MapPoint[] =[];
+       let points: MapPoint[] =[];
+       let pointsInfo: MyMapProps = {locations:[], drawRoute: false};
+
        const parser = new DOMParser();
        const doc = parser.parseFromString(text, "application/xml");
+       
+       //here we checking what type of file do we have
        const wptTags = doc.querySelectorAll('wpt');
+       //in this case we have file only with points
+       if (wptTags.length >0){
+        points = PointsHelper.getOnlyPoints(wptTags);
+        pointsInfo.drawRoute = false;
+       }
 
-       wptTags.forEach(tag => {
-        points.push({
-          key: tag.querySelector('name').textContent || '',
-          location: {
-            lat: parseFloat(tag.getAttribute('lat')),
-            lng:parseFloat(tag.getAttribute('lon'))
-          }
-        });
-       });
+       const trkptTags = doc.querySelectorAll('trkpt');
+       if (trkptTags.length >0){
+        points = PointsHelper.getPointsWithRoute(trkptTags);
+        pointsInfo.drawRoute = true;
+       }
+       pointsInfo.locations = points;
 
-       //console.log(wptTags);
-       return points
+       return pointsInfo;
     });
 }
 
 export const fetchPoints = (fileName: string)=>{
   return async (dispatch: Dispatch<AnyAction>) =>{
-    const points = await fetchPointsFromFile(fileName);
+    const pointsInfo = await fetchPointsFromFile(fileName);
     dispatch<FetchAction>({
-      payload: points,
+      payload: pointsInfo,
       type: ActionTypes.FETCH
     });
   };
 };
 
 export interface AppProps{
-  points: MapPoint[];
+  pointsInfo: MyMapProps;
   fetchPoints: Function;
 }
 
@@ -73,7 +80,7 @@ class _App extends React.Component<AppProps, AppState>{
     //only from /public/testdata/ folder
     try {
       let filename:string = this.fileInput.current.files[0].name;
-      this.props.fetchPoints(`/testdata/${filename}`);  
+      this.props.fetchPoints(`/testdata/${filename}`);
     } catch (error) {
       alert('You have to choose .gpx file with points first'); 
     }
@@ -88,7 +95,7 @@ class _App extends React.Component<AppProps, AppState>{
         <input type="file" id="pointsFile" name="pointsFile" ref={this.fileInput} accept=".gpx" />
         <button>Get points</button>
       </form>
-      <OurGoogleMap locations={this.props.points} drawRoute={false} />
+      <OurGoogleMap locations={this.props.pointsInfo.locations} drawRoute={this.props.pointsInfo.drawRoute} />
       <footer>version:{process.env.REACT_APP_VERSION}</footer>
       </div>
     );
@@ -96,11 +103,13 @@ class _App extends React.Component<AppProps, AppState>{
 }
 
 
-const mapStateProps = (state:StoreState):{ points: MapPoint[]} =>{
-  return {points: state.points}
+const mapStateProps = (state:StoreState):{ pointsInfo: MyMapProps} =>{
+  return {pointsInfo: state.pointsInfo}
 };
 
 export const App = connect(
   mapStateProps,
   { fetchPoints }
 )(_App);
+
+
