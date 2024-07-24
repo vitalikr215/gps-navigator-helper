@@ -156,4 +156,16 @@ And here how looks like track recorded by this navigator (we need this to get th
 
 So here we need to get _lat_ and _lon_ attributes of _trkpt_ within _trk_ and _trkseg_ tags.
 
+## Choosing implementation tools
+
+After some expriments decided to use for Google Maps integration [react-google-maps library](https://www.npmjs.com/package/@vis.gl/react-google-maps), it has a great [documentation](https://developers.google.com/codelabs/maps-platform/maps-platform-101-react-js#4) and a rich amount of [different samples](https://github.com/visgl/react-google-maps/tree/main/examples/geometry/src). Of course the previous choice predefine using React/Redux as a base of application. For working with xml firstly going to use [xml2js](https://www.npmjs.com/package/xml2js) package, but spent quite a lot of time but could not properly figure out with it (looks like it has some problems with React and(or) Typescript integrations) :smile: So then decided to stick with a native solution using [DOMParser](https://developer.mozilla.org/en-US/docs/Web/API/DOMParser).
+
+## Changelog
+
+- [0.4.3](https://github.com/vitalikr215/gps-navigator-helper/releases/tag/0.4.3) Implemented showing on GoogleMap separate points from .gpx file that contains only points
+- [0.5.3](https://github.com/vitalikr215/gps-navigator-helper/releases/tag/0.5.3) Implemented parsing .gpx file that contains routes. Show this route on GoogleMap based on route points and connect these points with a polyline.
+  <br>\* found out that if the number of poins added to GoogleMap more than 300 rendering become a slow and lags appered. So, when show routes, going to add just first and last point of the route (to reduce a number of points added to map). Another one findig is that route could consist of several segments (it's a straight analog of different journey with your navigator). Such segments separated by _<trkseg>_ tag on .gpx file and know last point of previous segment connected with first point of next segment which is looks weird
+  ![imgage](./images/segment-problem.png)
+  <br>So, then next going to draw different route segments with different polylines, and also will make them different color for better user experience, to explicitly show that it's a different journey.
+
 ### _To be continued..._
