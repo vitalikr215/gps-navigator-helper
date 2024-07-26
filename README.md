@@ -167,5 +167,6 @@ After some expriments decided to use for Google Maps integration [react-google-m
   <br>\* found out that if the number of poins added to GoogleMap more than 300 rendering become a slow and lags appered. So, when show routes, going to add just first and last point of the route (to reduce a number of points added to map). Another one findig is that route could consist of several segments (it's a straight analog of different journey with your navigator). Such segments separated by _<trkseg>_ tag on .gpx file and know last point of previous segment connected with first point of next segment which is looks weird
   ![imgage](./images/segment-problem.png)
   <br>So, then next going to draw different route segments with different polylines, and also will make them different color for better user experience, to explicitly show that it's a different journey.
+- [0.6.4](https://github.com/vitalikr215/gps-navigator-helper/releases/tag/0.6.4) Fixed that routes are mixed up between each other, by drawing them in separate polyline and different colors. Also now adding only first and last point of the route segment for better user experience.
 
 ### _To be continued..._
