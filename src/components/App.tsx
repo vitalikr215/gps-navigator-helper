@@ -35,19 +35,17 @@ function fetchPointsFromFile(file: string): Promise<MyMapProps> {
        if (wptTags.length >0){
         points = PointsHelper.getOnlyPoints(wptTags);
         pointsInfo.drawRoute = false;
+        pointsInfo.locations = points;
        }
 
-       const trkptTags = doc.querySelectorAll('trkpt');
-       if (trkptTags.length >0){
-        points = PointsHelper.getPointsWithRoute(trkptTags);
+       const trksegTags = doc.querySelectorAll('trkseg');
+       if (trksegTags.length >0){
+        const pointsAndSegments = PointsHelper.getPointsWithRoute(trksegTags);
         pointsInfo.drawRoute = true;
+        pointsInfo.locations = pointsAndSegments.mapPoints;
+        pointsInfo.routeSegments = pointsAndSegments.routeSegments;
        }
-       pointsInfo.locations = points;
-
-       //mock route segments
-       pointsInfo.routeSegments = [{start:0, end:20}, {start:21, end: 40}, {start: 41, end:60}];
-       pointsInfo.segmentsStartEndPoints= [points[0], points[20], points[21], points[40],points[41], points[60]];
-
+       
        return pointsInfo;
     });
 }
@@ -87,6 +85,7 @@ class _App extends React.Component<AppProps, AppState>{
     try {
       let filename:string = this.fileInput.current.files[0].name;
       this.props.fetchPoints(`/testdata/${filename}`);
+      //this.props.fetchPoints(`/testdata/Points-with-routes.gpx`);
     } catch (error) {
       alert('You have to choose .gpx file with points first'); 
     }

@@ -84,7 +84,6 @@ function usePolyline(props: PolylineProps) {
       path = geometryLibrary.encoding.decodePath(encodedPath);
     }
     else if (rawPath){
-      console.log('using rawPath');
       rawPath.map(p=>{
         path.push(new google.maps.LatLng({lat: p.location.lat, lng: p.location.lng}));
       });

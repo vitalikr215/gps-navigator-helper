@@ -3,6 +3,7 @@ import { APIProvider, AdvancedMarker, Map } from "@vis.gl/react-google-maps";
 import { MapPoint, Segment } from "../entities/MapPoint";
 import { MyMapProps } from "../props/MyMapProps";
 import { Polyline } from "./Polyline";
+import { ColorHelper } from "../helpers/ColorHelper";
 
 function getCenter(points: MapPoint[]): MapPoint{
   let position = Math.round(points.length/2)
@@ -13,7 +14,6 @@ function getCenter(points: MapPoint[]): MapPoint{
     return points[position];
   }
 }
-
 
 export const OurGoogleMap: React.FC<MyMapProps> = ({locations, drawRoute, routeSegments, segmentsStartEndPoints})=>{
 
@@ -38,8 +38,9 @@ export const OurGoogleMap: React.FC<MyMapProps> = ({locations, drawRoute, routeS
     return (
       <>
         {
-          
-          props.points.map( (p: MapPoint) => (
+          props.points
+          .filter(p => p.addMarker)
+          .map( (p: MapPoint) => (
           <AdvancedMarker
             key={p.key}
             position={p.location}>
@@ -57,7 +58,7 @@ export const OurGoogleMap: React.FC<MyMapProps> = ({locations, drawRoute, routeS
             <Polyline
             key={`polilyne${segment.start}`}
             strokeWeight={10}
-            strokeColor={'#ff22cc88'}
+            strokeColor={ColorHelper.getRandomColor()}
             rawPath={drawRoute ? props.points.slice(segment.start,segment.end) : null}
             />
           ))
@@ -70,7 +71,7 @@ export const OurGoogleMap: React.FC<MyMapProps> = ({locations, drawRoute, routeS
     <APIProvider apiKey={apiKey}>
       <Map defaultCenter={defaultProps.center}
         defaultZoom={defaultProps.zoom} mapId='DEMO_MAP_ID'>
-        <PointMarkers points={drawRoute ? segmentsStartEndPoints : locations}/>
+        <PointMarkers points={locations}/>
         <Polylines points={locations} segments={routeSegments}/>
       </Map>
     </APIProvider>
