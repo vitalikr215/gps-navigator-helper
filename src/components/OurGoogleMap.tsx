@@ -1,8 +1,9 @@
 import React, { useEffect } from "react";
 import { APIProvider, AdvancedMarker, Map } from "@vis.gl/react-google-maps";
-import { MapPoint } from "../entities/MapPoint";
+import { MapPoint, Segment } from "../entities/MapPoint";
 import { MyMapProps } from "../props/MyMapProps";
 import { Polyline } from "./Polyline";
+import { ColorHelper } from "../helpers/ColorHelper";
 
 function getCenter(points: MapPoint[]): MapPoint{
   let position = Math.round(points.length/2)
@@ -14,7 +15,7 @@ function getCenter(points: MapPoint[]): MapPoint{
   }
 }
 
-export const OurGoogleMap: React.FC<MyMapProps> = ({locations, drawRoute})=>{
+export const OurGoogleMap: React.FC<MyMapProps> = ({locations, drawRoute, routeSegments, segmentsStartEndPoints})=>{
 
   let defaultProps ={
     center: {
@@ -36,7 +37,10 @@ export const OurGoogleMap: React.FC<MyMapProps> = ({locations, drawRoute})=>{
   const PointMarkers = (props: {points: MapPoint[]}) => {
     return (
       <>
-        {props.points.map( (p: MapPoint) => (
+        {
+          props.points
+          .filter(p => p.addMarker)
+          .map( (p: MapPoint) => (
           <AdvancedMarker
             key={p.key}
             position={p.location}>
@@ -45,18 +49,30 @@ export const OurGoogleMap: React.FC<MyMapProps> = ({locations, drawRoute})=>{
       </>
     );
   };
+
+  const Polylines = (props: {points: MapPoint[], segments: Segment[]}) =>{    
+    return(
+      <>
+        {
+          props.segments.map( (segment:Segment) =>(
+            <Polyline
+            key={`polilyne${segment.start}`}
+            strokeWeight={10}
+            strokeColor={ColorHelper.getRandomColor()}
+            rawPath={drawRoute ? props.points.slice(segment.start,segment.end) : null}
+            />
+          ))
+        }
+      </>
+    )
+  };
   
   return(<div className="map-div">
     <APIProvider apiKey={apiKey}>
       <Map defaultCenter={defaultProps.center}
         defaultZoom={defaultProps.zoom} mapId='DEMO_MAP_ID'>
         <PointMarkers points={locations}/>
-        <Polyline
-          strokeWeight={10}
-          strokeColor={'#ff22cc88'}
-          rawPath={drawRoute ? locations : null}
-          //encodedPath={POLYGONS[11]}
-        />
+        <Polylines points={locations} segments={routeSegments}/>
       </Map>
     </APIProvider>
   </div>

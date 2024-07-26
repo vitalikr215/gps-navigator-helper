@@ -1,4 +1,4 @@
-import { MapPoint } from "../entities/MapPoint";
+import { MapPoint, Segment } from "../entities/MapPoint";
 
 export class PointsHelper{
 
@@ -11,43 +11,51 @@ export class PointsHelper{
         location: {
           lat: parseFloat(tag.getAttribute('lat')),
           lng:parseFloat(tag.getAttribute('lon'))
-        }
+        },
+        addMarker: true
       });
      });
     return points;
   }
   
-  /**Parses <trkpt> tag and returns array of points from .gpx file that contains routes */
-  public static getPointsWithRoute(tags: NodeListOf<Element>): MapPoint[] {
+  /**Parses <trkseg> tags and returns the union of array of points from .gpx file that contains routes
+   * and an array with Segments of routes
+  */
+  public static getPointsWithRoute(tags: NodeListOf<Element>): {mapPoints: MapPoint[], routeSegments: Segment[]} {
     const points: MapPoint[] =[];
-    let i = 0;
-    const coeff = calculateCoeficient(tags.length);
-  
-    tags.forEach(tag => {
-      if (i == 0 || (i % coeff == 0)){
+    const segments: Segment[]=[];
+    let totalPointsCounts = 0;
+
+    //iterate trkseg tags
+    for (let index = 0; index < tags.length; index++) {
+      //counter for points in segment
+      let segmentPointsCounter = 0;
+      
+      //itearate inner trkpt tags
+      const innerTags = tags[index].querySelectorAll('trkpt');
+      innerTags.forEach(tag =>{
         points.push({
-          key: `p${i}`,
+          key: `p${totalPointsCounts}`,
           location: {
             lat: parseFloat(tag.getAttribute('lat')),
             lng:parseFloat(tag.getAttribute('lon'))
           }
         });
-      }
-      i++;
-     });
-    console.log (`tprk tags: ${points.length}`);
-    return points;
-  }
-}
+        totalPointsCounts++;
+        segmentPointsCounter++;
+      });
+      
+      //make first and last point for segment showable
+      points[totalPointsCounts-segmentPointsCounter].addMarker = true;
+      points[totalPointsCounts-1].addMarker = true;
 
-/**Calculates the number of skipping points based of the total number of the points */
-function calculateCoeficient(pointsCount:number) : number{
-  switch (true) {
-    case (pointsCount <= 1000):
-        return pointsCount/10;
-    case (pointsCount >= 1001 || pointsCount<=9999):
-      return Math.round(pointsCount/200);
-    case (pointsCount >= 10000):
-        return Math.round(pointsCount/250);
+      //store point's indexes to segments
+      segments.push({
+        start: totalPointsCounts - segmentPointsCounter,
+        end: totalPointsCounts -1
+      });
+    }
+
+    return {mapPoints: points, routeSegments: segments};
   }
 }

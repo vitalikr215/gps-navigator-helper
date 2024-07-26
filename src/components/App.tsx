@@ -7,6 +7,7 @@ import { connect } from "react-redux";
 import { StoreState } from '..';
 import { PointsHelper } from '../helpers/PointsHelper';
 import { MyMapProps } from '../props/MyMapProps';
+import { start } from 'repl';
 
 export interface FetchAction {
   payload: MyMapProps,
@@ -22,7 +23,8 @@ function fetchPointsFromFile(file: string): Promise<MyMapProps> {
     .then(response => response.text())
     .then(text => {
        let points: MapPoint[] =[];
-       let pointsInfo: MyMapProps = {locations:[], drawRoute: false};
+       let pointsInfo: MyMapProps = {locations:[], drawRoute: false, routeSegments:[]
+        , segmentsStartEndPoints:[]};
 
        const parser = new DOMParser();
        const doc = parser.parseFromString(text, "application/xml");
@@ -33,15 +35,17 @@ function fetchPointsFromFile(file: string): Promise<MyMapProps> {
        if (wptTags.length >0){
         points = PointsHelper.getOnlyPoints(wptTags);
         pointsInfo.drawRoute = false;
+        pointsInfo.locations = points;
        }
 
-       const trkptTags = doc.querySelectorAll('trkpt');
-       if (trkptTags.length >0){
-        points = PointsHelper.getPointsWithRoute(trkptTags);
+       const trksegTags = doc.querySelectorAll('trkseg');
+       if (trksegTags.length >0){
+        const pointsAndSegments = PointsHelper.getPointsWithRoute(trksegTags);
         pointsInfo.drawRoute = true;
+        pointsInfo.locations = pointsAndSegments.mapPoints;
+        pointsInfo.routeSegments = pointsAndSegments.routeSegments;
        }
-       pointsInfo.locations = points;
-
+       
        return pointsInfo;
     });
 }
@@ -81,6 +85,7 @@ class _App extends React.Component<AppProps, AppState>{
     try {
       let filename:string = this.fileInput.current.files[0].name;
       this.props.fetchPoints(`/testdata/${filename}`);
+      //this.props.fetchPoints(`/testdata/Points-with-routes.gpx`);
     } catch (error) {
       alert('You have to choose .gpx file with points first'); 
     }
@@ -95,7 +100,10 @@ class _App extends React.Component<AppProps, AppState>{
         <input type="file" id="pointsFile" name="pointsFile" ref={this.fileInput} accept=".gpx" />
         <button>Get points</button>
       </form>
-      <OurGoogleMap locations={this.props.pointsInfo.locations} drawRoute={this.props.pointsInfo.drawRoute} />
+      <OurGoogleMap locations={this.props.pointsInfo.locations} 
+        drawRoute={this.props.pointsInfo.drawRoute} 
+        routeSegments={this.props.pointsInfo.routeSegments}
+        segmentsStartEndPoints={this.props.pointsInfo.segmentsStartEndPoints}/>
       <footer>version:{process.env.REACT_APP_VERSION}</footer>
       </div>
     );
