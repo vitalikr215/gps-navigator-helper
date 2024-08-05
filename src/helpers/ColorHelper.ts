@@ -1,7 +1,6 @@
 export class ColorHelper{
   public static getRandomColor(): string{
     const random = Math.round(Math.random()* (ColorHelper._colors.length-1));
-    console.log(ColorHelper._colors[random]);
     return this._colors[random];
   }
 

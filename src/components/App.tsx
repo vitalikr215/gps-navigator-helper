@@ -1,4 +1,4 @@
-import React, { FormEvent, ReactNode } from 'react';
+import React, { FormEvent, ReactNode, useState } from 'react';
 import { OurGoogleMap } from './OurGoogleMap';
 import './App.css';
 import { MapPoint } from '../entities/MapPoint';
@@ -23,8 +23,7 @@ function fetchPointsFromFile(file: string): Promise<MyMapProps> {
     .then(response => response.text())
     .then(text => {
        let points: MapPoint[] =[];
-       let pointsInfo: MyMapProps = {locations:[], drawRoute: false, routeSegments:[]
-        , segmentsStartEndPoints:[]};
+       let pointsInfo: MyMapProps = {locations:[], drawRoute: false, routeSegments:[]};
 
        const parser = new DOMParser();
        const doc = parser.parseFromString(text, "application/xml");
@@ -67,14 +66,15 @@ export interface AppProps{
 
 interface AppState{
   fetching: boolean;
+  isNewRoute: boolean;
 }
 
 class _App extends React.Component<AppProps, AppState>{
   fileInput: any;
-
+  
   constructor(props: AppProps){
     super(props);
-    this.state = {fetching: false};
+    this.state = {fetching: false, isNewRoute: false};
     this.fileInput = React.createRef();
   }
 
@@ -91,6 +91,11 @@ class _App extends React.Component<AppProps, AppState>{
     }
   };
   
+  onCreateRouteModeChange = (event: any)=>{
+    this.setState({isNewRoute : !this.state.isNewRoute});
+    //console.log(this.state.isNewRoute);
+  };
+  
   render(): ReactNode {
     return (
       <div id='appDiv'>
@@ -102,8 +107,7 @@ class _App extends React.Component<AppProps, AppState>{
       </form>
       <OurGoogleMap locations={this.props.pointsInfo.locations} 
         drawRoute={this.props.pointsInfo.drawRoute} 
-        routeSegments={this.props.pointsInfo.routeSegments}
-        segmentsStartEndPoints={this.props.pointsInfo.segmentsStartEndPoints}/>
+        routeSegments={this.props.pointsInfo.routeSegments}/>
       <footer>version:{process.env.REACT_APP_VERSION}</footer>
       </div>
     );

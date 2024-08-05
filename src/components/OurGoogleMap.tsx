@@ -1,5 +1,5 @@
-import React, { useEffect } from "react";
-import { APIProvider, AdvancedMarker, Map } from "@vis.gl/react-google-maps";
+import React, { useCallback, useEffect, useState } from "react";
+import { APIProvider, AdvancedMarker, Map, MapMouseEvent } from "@vis.gl/react-google-maps";
 import { MapPoint, Segment } from "../entities/MapPoint";
 import { MyMapProps } from "../props/MyMapProps";
 import { Polyline } from "./Polyline";
@@ -15,7 +15,15 @@ function getCenter(points: MapPoint[]): MapPoint{
   }
 }
 
-export const OurGoogleMap: React.FC<MyMapProps> = ({locations, drawRoute, routeSegments, segmentsStartEndPoints})=>{
+export const OurGoogleMap: React.FC<MyMapProps> = ({locations, drawRoute, routeSegments})=>{
+
+  const [loc, setLocations] = useState<MapPoint[]>([]);
+
+  useEffect(() => {
+    if (locations.length > 0) {
+      setLocations(locations);
+    }
+  }, [locations]);
 
   let defaultProps ={
     center: {
@@ -66,13 +74,23 @@ export const OurGoogleMap: React.FC<MyMapProps> = ({locations, drawRoute, routeS
       </>
     )
   };
+
+  const onDblclick = (ev: MapMouseEvent)=>{
+    setLocations([
+      ...loc,
+      { location: ev.detail.latLng, addMarker: true }
+    ]);
+  };
+
+  
   
   return(<div className="map-div">
     <APIProvider apiKey={apiKey}>
       <Map defaultCenter={defaultProps.center}
-        defaultZoom={defaultProps.zoom} mapId='DEMO_MAP_ID'>
-        <PointMarkers points={locations}/>
-        <Polylines points={locations} segments={routeSegments}/>
+        defaultZoom={defaultProps.zoom} mapId='DEMO_MAP_ID' 
+        disableDoubleClickZoom = {true} onDblclick={onDblclick}>
+        <PointMarkers points={loc}/>
+        <Polylines points={loc} segments={routeSegments}/>
       </Map>
     </APIProvider>
   </div>

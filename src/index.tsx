@@ -15,8 +15,7 @@ export const pointsReducer = (state: MyMapProps, action: FetchAction) :MyMapProp
     case ActionTypes.FETCH:
       return action.payload;   
     default:
-      const defaultInfo: MyMapProps = {locations: [], drawRoute: false, 
-        routeSegments:[], segmentsStartEndPoints:[]};
+      const defaultInfo: MyMapProps = {locations: [], drawRoute: false, routeSegments:[]};
       return defaultInfo;
   }
 }
