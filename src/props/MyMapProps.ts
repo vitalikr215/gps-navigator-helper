@@ -4,4 +4,5 @@ export interface MyMapProps{
   locations: MapPoint[];
   routeSegments: Segment[];
   drawRoute: boolean;
+  newRoute: boolean;
 }

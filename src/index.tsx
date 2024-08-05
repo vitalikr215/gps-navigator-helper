@@ -1,5 +1,5 @@
 import ReactDOM  from "react-dom";
-import {ActionTypes, App, FetchAction} from './components/App';
+import {ActionTypes, App, FetchAction, NewRouteAction} from './components/App';
 import { Reducer, applyMiddleware, combineReducers, createStore } from 'redux';
 import { MapPoint } from './entities/MapPoint';
 import { thunk } from 'redux-thunk';
@@ -10,12 +10,14 @@ export interface StoreState{
   pointsInfo: MyMapProps;
 }
 
-export const pointsReducer = (state: MyMapProps, action: FetchAction) :MyMapProps=>{
+export const pointsReducer = (state: MyMapProps, action: FetchAction | NewRouteAction) :MyMapProps=>{
   switch (action.type) {
     case ActionTypes.FETCH:
-      return action.payload;   
+      return action.payload;
+    case ActionTypes.NEW_ROUTE:
+      return action.payload;
     default:
-      const defaultInfo: MyMapProps = {locations: [], drawRoute: false, routeSegments:[]};
+      const defaultInfo: MyMapProps = {locations: [], drawRoute: false, routeSegments:[], newRoute: false};
       return defaultInfo;
   }
 }

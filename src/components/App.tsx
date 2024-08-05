@@ -1,4 +1,4 @@
-import React, { FormEvent, ReactNode, useState } from 'react';
+import React, { FormEvent, ReactNode, useRef, useState } from 'react';
 import { OurGoogleMap } from './OurGoogleMap';
 import './App.css';
 import { MapPoint } from '../entities/MapPoint';
@@ -14,8 +14,14 @@ export interface FetchAction {
   type: ActionTypes.FETCH
 }
 
+export interface NewRouteAction{
+  payload: MyMapProps,
+  type: ActionTypes.NEW_ROUTE
+}
+
 export enum ActionTypes{
-  FETCH
+  FETCH,
+  NEW_ROUTE
 }
 
 function fetchPointsFromFile(file: string): Promise<MyMapProps> {
@@ -23,7 +29,7 @@ function fetchPointsFromFile(file: string): Promise<MyMapProps> {
     .then(response => response.text())
     .then(text => {
        let points: MapPoint[] =[];
-       let pointsInfo: MyMapProps = {locations:[], drawRoute: false, routeSegments:[]};
+       let pointsInfo: MyMapProps = {locations:[], drawRoute: false, routeSegments:[], newRoute: false};
 
        const parser = new DOMParser();
        const doc = parser.parseFromString(text, "application/xml");
@@ -59,9 +65,19 @@ export const fetchPoints = (fileName: string)=>{
   };
 };
 
+export const setNewRouteMode = ()=>{
+  return async (dispatch: Dispatch<AnyAction>) =>{
+    dispatch<NewRouteAction>({
+      payload: { locations:[], routeSegments: [], drawRoute: false, newRoute: true},
+      type: ActionTypes.NEW_ROUTE
+    });
+  };
+}
+
 export interface AppProps{
   pointsInfo: MyMapProps;
   fetchPoints: Function;
+  setNewRouteMode: Function;
 }
 
 interface AppState{
@@ -71,11 +87,13 @@ interface AppState{
 
 class _App extends React.Component<AppProps, AppState>{
   fileInput: any;
+  checkboxRef;// = useRef(null)
   
   constructor(props: AppProps){
     super(props);
     this.state = {fetching: false, isNewRoute: false};
     this.fileInput = React.createRef();
+    this.checkboxRef = React.createRef();
   }
 
   onGetPoints = (event:FormEvent<HTMLFormElement>)=>{
@@ -92,8 +110,11 @@ class _App extends React.Component<AppProps, AppState>{
   };
   
   onCreateRouteModeChange = (event: any)=>{
-    this.setState({isNewRoute : !this.state.isNewRoute});
-    //console.log(this.state.isNewRoute);
+    //if checked new route checkbox clear points and routes
+    if (this.checkboxRef.current.checked){
+      console.log(this.checkboxRef.current.checked + " pass empty props");
+      this.props.setNewRouteMode();  
+    }
   };
   
   render(): ReactNode {
@@ -105,9 +126,14 @@ class _App extends React.Component<AppProps, AppState>{
         <input type="file" id="pointsFile" name="pointsFile" ref={this.fileInput} accept=".gpx" />
         <button>Get points</button>
       </form>
+      <div style={{marginTop: 10}}>
+        <input type="checkbox" id="chkCreateRoute" name="createRoute" ref={this.checkboxRef} defaultChecked={false} onChange={this.onCreateRouteModeChange}/>
+        <label htmlFor="chkCreateRoute"> Create new route</label><br></br>
+      </div>
       <OurGoogleMap locations={this.props.pointsInfo.locations} 
         drawRoute={this.props.pointsInfo.drawRoute} 
-        routeSegments={this.props.pointsInfo.routeSegments}/>
+        routeSegments={this.props.pointsInfo.routeSegments}
+        newRoute={this.props.pointsInfo.newRoute}/>
       <footer>version:{process.env.REACT_APP_VERSION}</footer>
       </div>
     );
@@ -121,7 +147,7 @@ const mapStateProps = (state:StoreState):{ pointsInfo: MyMapProps} =>{
 
 export const App = connect(
   mapStateProps,
-  { fetchPoints }
+  { fetchPoints, setNewRouteMode }
 )(_App);
 
 

@@ -15,13 +15,16 @@ function getCenter(points: MapPoint[]): MapPoint{
   }
 }
 
-export const OurGoogleMap: React.FC<MyMapProps> = ({locations, drawRoute, routeSegments})=>{
+export const OurGoogleMap: React.FC<MyMapProps> = ({locations, drawRoute, routeSegments, newRoute})=>{
 
   const [loc, setLocations] = useState<MapPoint[]>([]);
 
   useEffect(() => {
-    if (locations.length > 0) {
+    if (locations.length > 0 && !newRoute) {
       setLocations(locations);
+    }
+    else if (newRoute){
+      setLocations([]);
     }
   }, [locations]);
 
@@ -76,10 +79,13 @@ export const OurGoogleMap: React.FC<MyMapProps> = ({locations, drawRoute, routeS
   };
 
   const onDblclick = (ev: MapMouseEvent)=>{
-    setLocations([
-      ...loc,
-      { location: ev.detail.latLng, addMarker: true }
-    ]);
+    //add point on map only in case when we are in new route mode
+    if (newRoute){
+      setLocations([
+        ...loc,
+        { location: ev.detail.latLng, addMarker: true }
+      ]);
+    }
   };
 
   
