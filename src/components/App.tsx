@@ -65,10 +65,10 @@ export const fetchPoints = (fileName: string)=>{
   };
 };
 
-export const setNewRouteMode = ()=>{
+export const setNewRouteMode = (modeOn: boolean)=>{
   return async (dispatch: Dispatch<AnyAction>) =>{
     dispatch<NewRouteAction>({
-      payload: { locations:[], routeSegments: [], drawRoute: false, newRoute: true},
+      payload: { locations:[], routeSegments: [], drawRoute: false, newRoute: modeOn},
       type: ActionTypes.NEW_ROUTE
     });
   };
@@ -111,10 +111,7 @@ class _App extends React.Component<AppProps, AppState>{
   
   onCreateRouteModeChange = (event: any)=>{
     //if checked new route checkbox clear points and routes
-    if (this.checkboxRef.current.checked){
-      console.log(this.checkboxRef.current.checked + " pass empty props");
-      this.props.setNewRouteMode();  
-    }
+    this.props.setNewRouteMode(this.checkboxRef.current.checked);
   };
   
   render(): ReactNode {

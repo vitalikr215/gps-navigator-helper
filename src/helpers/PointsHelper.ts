@@ -58,4 +58,8 @@ export class PointsHelper{
 
     return {mapPoints: points, routeSegments: segments};
   }
+
+  public static GetDefaultPointName():string{
+    return `p${Date.now()}`;
+  }
 }

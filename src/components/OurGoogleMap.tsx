@@ -4,6 +4,7 @@ import { MapPoint, Segment } from "../entities/MapPoint";
 import { MyMapProps } from "../props/MyMapProps";
 import { Polyline } from "./Polyline";
 import { ColorHelper } from "../helpers/ColorHelper";
+import { PointsHelper } from "../helpers/PointsHelper";
 
 function getCenter(points: MapPoint[]): MapPoint{
   let position = Math.round(points.length/2)
@@ -78,19 +79,49 @@ export const OurGoogleMap: React.FC<MyMapProps> = ({locations, drawRoute, routeS
     )
   };
 
+  const PointsList = (props:{points: MapPoint[]})=>{    
+    return(
+      <div>
+        {
+          props.points.map( (p: MapPoint) => (
+            <div>
+            <div>
+              <button value={p.id} onClick={removePointFromRoute}>[ X ]</button>
+            </div>
+            <div>
+              <input className="point-name-input" type="text" value={p.key}></input>
+              <p className="point-coord-text">{p.location.lat}, {p.location.lng}</p>
+            </div>
+            </div>
+          ))
+        }
+      </div>
+    )
+  }
+
   const onDblclick = (ev: MapMouseEvent)=>{
     //add point on map only in case when we are in new route mode
     if (newRoute){
       setLocations([
         ...loc,
-        { location: ev.detail.latLng, addMarker: true }
+        { 
+          location: ev.detail.latLng, addMarker: true, key: PointsHelper.GetDefaultPointName(), 
+          id: loc.length>0 ? loc[loc.length-1].id++ : 1 
+        }
       ]);
     }
   };
 
+  const removePointFromRoute = (event: any) => {
+    let idToRemove = Number(event.target.value)
+    let updatedPoints = loc.filter(item => item.id !== idToRemove);
+    setLocations(updatedPoints);
+    //console.log(loc.length);
+  }
   
   
-  return(<div className="map-div">
+  return(<div>
+  <div className="map-div">
     <APIProvider apiKey={apiKey}>
       <Map defaultCenter={defaultProps.center}
         defaultZoom={defaultProps.zoom} mapId='DEMO_MAP_ID' 
@@ -99,6 +130,8 @@ export const OurGoogleMap: React.FC<MyMapProps> = ({locations, drawRoute, routeS
         <Polylines points={loc} segments={routeSegments}/>
       </Map>
     </APIProvider>
+  </div>
+    {newRoute && <PointsList points={loc}/>} 
   </div>
   )
 }

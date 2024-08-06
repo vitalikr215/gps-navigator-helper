@@ -1,4 +1,5 @@
 export interface MapPoint{
+  id?: number;
   key?: string;
   location: google.maps.LatLngLiteral;
   addMarker? : boolean;
