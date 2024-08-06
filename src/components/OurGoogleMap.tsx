@@ -79,9 +79,13 @@ export const OurGoogleMap: React.FC<MyMapProps> = ({locations, drawRoute, routeS
     )
   };
 
+  //<button style={}><img src='/icons8-save-50.png'/></button>
   const PointsList = (props:{points: MapPoint[]})=>{    
     return(
-      <div>
+      <div className="flex-child-element">
+        <h4>
+          Route points:
+        </h4>
         {
           props.points.map( (p: MapPoint) => (
             <div>
@@ -120,7 +124,7 @@ export const OurGoogleMap: React.FC<MyMapProps> = ({locations, drawRoute, routeS
   }
   
   
-  return(<div>
+  return(<div className="flex-parent-div">
   <div className="map-div">
     <APIProvider apiKey={apiKey}>
       <Map defaultCenter={defaultProps.center}
@@ -130,7 +134,7 @@ export const OurGoogleMap: React.FC<MyMapProps> = ({locations, drawRoute, routeS
         <Polylines points={loc} segments={routeSegments}/>
       </Map>
     </APIProvider>
-  </div>
+  </div >
     {newRoute && <PointsList points={loc}/>} 
   </div>
   )
