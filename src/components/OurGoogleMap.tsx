@@ -16,6 +16,8 @@ function getCenter(points: MapPoint[]): MapPoint{
   }
 }
 
+let idCounter =1;
+
 export const OurGoogleMap: React.FC<MyMapProps> = ({locations, drawRoute, routeSegments, newRoute})=>{
 
   const [loc, setLocations] = useState<MapPoint[]>([]);
@@ -93,7 +95,7 @@ export const OurGoogleMap: React.FC<MyMapProps> = ({locations, drawRoute, routeS
               <button value={p.id} onClick={removePointFromRoute}>[ X ]</button>
             </div>
             <div>
-              <input className="point-name-input" type="text" value={p.key}></input>
+              <input className="point-name-input" readOnly type="text" value={p.key}></input>
               <p className="point-coord-text">{p.location.lat}, {p.location.lng}</p>
             </div>
             </div>
@@ -106,11 +108,13 @@ export const OurGoogleMap: React.FC<MyMapProps> = ({locations, drawRoute, routeS
   const onDblclick = (ev: MapMouseEvent)=>{
     //add point on map only in case when we are in new route mode
     if (newRoute){
-      setLocations([
-        ...loc,
+      setLocations((prevLocs) =>[
+        ...prevLocs,
         { 
-          location: ev.detail.latLng, addMarker: true, key: PointsHelper.GetDefaultPointName(), 
-          id: loc.length>0 ? loc[loc.length-1].id++ : 1 
+          location: ev.detail.latLng, 
+          addMarker: true, 
+          key: PointsHelper.GetDefaultPointName(), 
+          id: idCounter++ 
         }
       ]);
     }
