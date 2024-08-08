@@ -59,6 +59,10 @@ export class PointsHelper{
     return {mapPoints: points, routeSegments: segments};
   }
 
+  /**
+   * Gets unique default point name
+   * @returns point name based on current timestamp
+   */
   public static GetDefaultPointName():string{
     return `p${Date.now()}`;
   }

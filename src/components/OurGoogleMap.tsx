@@ -1,10 +1,11 @@
-import React, { useCallback, useEffect, useState } from "react";
+import React, { ChangeEvent, useCallback, useEffect, useRef, useState } from "react";
 import { APIProvider, AdvancedMarker, Map, MapMouseEvent } from "@vis.gl/react-google-maps";
 import { MapPoint, Segment } from "../entities/MapPoint";
 import { MyMapProps } from "../props/MyMapProps";
 import { Polyline } from "./Polyline";
 import { ColorHelper } from "../helpers/ColorHelper";
 import { PointsHelper } from "../helpers/PointsHelper";
+import { savePointsToGPX } from "../actions/actions";
 
 function getCenter(points: MapPoint[]): MapPoint{
   let position = Math.round(points.length/2)
@@ -83,11 +84,31 @@ export const OurGoogleMap: React.FC<MyMapProps> = ({locations, drawRoute, routeS
 
   //<button style={}><img src='/icons8-save-50.png'/></button>
   const PointsList = (props:{points: MapPoint[]})=>{    
+
+    const changePointNameAndUpdateState = (id: number) =>  (event: React.FocusEvent<HTMLInputElement>) => {
+      const newValue = event.target.value;
+      setLocations(prevPoints =>
+        prevPoints.map(point =>
+          point.id === id ? { ...point, key: newValue } : point
+        )
+      );
+    }
+    //local state for storing temp values for textbox
+    const [editingValue, setEditingValue] = useState<{ [id: number]: string }>({});
+
+    const handleChange = (id: number) => (event: ChangeEvent<HTMLInputElement>) => {
+      const newValue = event.target.value;
+      setEditingValue(prev => ({ ...prev, [id]: newValue }));
+    };
+
     return(
       <div className="flex-child-element">
-        <h4>
-          Route points:
-        </h4>
+        <div className="points-div">
+          <p>
+            Route points:
+          </p>
+          <button disabled={props.points.length==0} onClick={savePoints}><img src='/icons8-save-50.png'/></button>
+        </div>
         {
           props.points.map( (p: MapPoint) => (
             <div>
@@ -95,7 +116,9 @@ export const OurGoogleMap: React.FC<MyMapProps> = ({locations, drawRoute, routeS
               <button value={p.id} onClick={removePointFromRoute}>[ X ]</button>
             </div>
             <div>
-              <input className="point-name-input" readOnly type="text" value={p.key}></input>
+              <input className="point-name-input" onChange={handleChange(p.id)} onBlur={changePointNameAndUpdateState(p.id)}  type="text" 
+                value={ editingValue[p.id] || p.key || '' }>
+              </input>
               <p className="point-coord-text">{p.location.lat}, {p.location.lng}</p>
             </div>
             </div>
@@ -124,7 +147,11 @@ export const OurGoogleMap: React.FC<MyMapProps> = ({locations, drawRoute, routeS
     let idToRemove = Number(event.target.value)
     let updatedPoints = loc.filter(item => item.id !== idToRemove);
     setLocations(updatedPoints);
-    //console.log(loc.length);
+  }
+
+  const savePoints = (event: any)=>{
+    savePointsToGPX(loc);
+    alert('save');
   }
   
   
