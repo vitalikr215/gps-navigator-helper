@@ -7,19 +7,10 @@ import { ColorHelper } from "../helpers/ColorHelper";
 import { PointsHelper } from "../helpers/PointsHelper";
 import { savePointsToGPX } from "../actions/actions";
 
-function getCenter(points: MapPoint[]): MapPoint{
-  let position = Math.round(points.length/2)
-  if (position ==1){
-    return points[0];
-  }
-  else{
-    return points[position];
-  }
-}
 
 let idCounter =1;
 
-export const OurGoogleMap: React.FC<MyMapProps> = ({locations, drawRoute, routeSegments, newRoute})=>{
+export const OurGoogleMap: React.FC<MyMapProps> = ({locations, drawRoute, routeSegments, newRoute, center})=>{
 
   const [loc, setLocations] = useState<MapPoint[]>([]);
 
@@ -31,21 +22,6 @@ export const OurGoogleMap: React.FC<MyMapProps> = ({locations, drawRoute, routeS
       setLocations([]);
     }
   }, [locations]);
-
-  let defaultProps ={
-    center: {
-      lat: 48.47555614,
-      lng: 34.73800501
-    },
-    zoom: 11
-  };
-  
-  //calculate center coordinates based on existing points
-  if (locations.length>0){
-    const center = getCenter(locations);
-    defaultProps.center.lat = center.location.lat;
-    defaultProps.center.lng = center.location.lng;
-  }
 
   const apiKey = process.env.REACT_APP_GOOGLE_API_KEY;
 
@@ -154,12 +130,13 @@ export const OurGoogleMap: React.FC<MyMapProps> = ({locations, drawRoute, routeS
     alert('save');
   }
   
+  console.log(`Center location: ${center.location.lat},${center.location.lng}`);
   
   return(<div className="flex-parent-div">
   <div className="map-div">
     <APIProvider apiKey={apiKey}>
-      <Map defaultCenter={defaultProps.center}
-        defaultZoom={defaultProps.zoom} mapId='DEMO_MAP_ID' 
+      <Map center={center.location}
+        defaultZoom={11} mapId='DEMO_MAP_ID' 
         disableDoubleClickZoom = {true} onDblclick={onDblclick}>
         <PointMarkers points={loc}/>
         <Polylines points={loc} segments={routeSegments}/>

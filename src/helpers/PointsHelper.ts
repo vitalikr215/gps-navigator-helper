@@ -2,6 +2,8 @@ import { MapPoint, Segment } from "../entities/MapPoint";
 
 export class PointsHelper{
 
+  static DEFAULT_CENTER: MapPoint = { location: {lat:48.47555614, lng: 34.73800501}};
+  
   /**Parses <wpt> tag and returns array of points from .gpx file that contains only points */
   public static getOnlyPoints(tags: NodeListOf<Element>): MapPoint[]{
     const points: MapPoint[] =[];

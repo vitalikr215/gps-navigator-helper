@@ -32,7 +32,7 @@ export const fetchPoints = (fileName: string)=>{
 export const setNewRouteMode = (modeOn: boolean)=>{
   return async (dispatch: Dispatch<AnyAction>) =>{
     dispatch<NewRouteAction>({
-      payload: { locations:[], routeSegments: [], drawRoute: false, newRoute: modeOn},
+      payload: { locations:[], routeSegments: [], drawRoute: false, newRoute: modeOn, center: PointsHelper.DEFAULT_CENTER},
       type: ActionTypes.NEW_ROUTE
     });
   };
@@ -43,7 +43,7 @@ function fetchPointsFromFile(file: string): Promise<MyMapProps> {
     .then(response => response.text())
     .then(text => {
        let points: MapPoint[] =[];
-       let pointsInfo: MyMapProps = {locations:[], drawRoute: false, routeSegments:[], newRoute: false};
+       let pointsInfo: MyMapProps = {locations:[], drawRoute: false, routeSegments:[], newRoute: false, center: PointsHelper.DEFAULT_CENTER};
 
        const parser = new DOMParser();
        const doc = parser.parseFromString(text, "application/xml");
@@ -65,6 +65,15 @@ function fetchPointsFromFile(file: string): Promise<MyMapProps> {
         pointsInfo.routeSegments = pointsAndSegments.routeSegments;
        }
        
+       //setting up the point at which the GoogleMap will be centered
+       const centerPointPosition = Math.round(pointsInfo.locations.length/2) == 1 
+                                   ? 0
+                                   : Math.round(pointsInfo.locations.length/2) -1 
+       pointsInfo.center = {location: {
+                                        lat: pointsInfo.locations[centerPointPosition].location.lat,
+                                        lng: pointsInfo.locations[centerPointPosition].location.lng}
+       };
+
        return pointsInfo;
     });
 }

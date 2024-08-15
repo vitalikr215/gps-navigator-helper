@@ -52,7 +52,8 @@ class _App extends React.Component<AppProps, AppState>{
       <OurGoogleMap locations={this.props.pointsInfo.locations} 
         drawRoute={this.props.pointsInfo.drawRoute} 
         routeSegments={this.props.pointsInfo.routeSegments}
-        newRoute={this.props.pointsInfo.newRoute}/>
+        newRoute={this.props.pointsInfo.newRoute}
+        center={this.props.pointsInfo.center}/>
       <footer>version:{process.env.REACT_APP_VERSION}</footer>
       </div>
     );
