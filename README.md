@@ -74,6 +74,7 @@ So, as the puzzle is complete, and I have all I need, I am gonna to implement th
 
 - Get a points from navigator and show the route on Google Maps
 - Point out on the map desired points and save them for using on navigator
+- Support gpx files from another providers
 - TBD later...
 
 ## Garmin etrex 10 data format
@@ -155,6 +156,32 @@ And here how looks like track recorded by this navigator (we need this to get th
 ```
 
 So here we need to get _lat_ and _lon_ attributes of _trkpt_ within _trk_ and _trkseg_ tags.
+
+# Support gpx files from another providers
+
+Add ability to parse and build routes from gpx files from other providers
+
+## Nakarte gpx data format
+
+[nakarte](https://nakarte.me) has the following data format, here is an exmple of the route
+
+```
+<?xml version="1.0" encoding="UTF-8" standalone="no" ?>
+<gpx xmlns="http://www.topografix.com/GPX/1/1" creator="http://nakarte.me" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.topografix.com/GPX/1/1 http://www.topografix.com/GPX/1/1/gpx.xsd" version="1.1">
+	<metadata>
+		<time>2024-08-21T07:30:32.073Z</time>
+	</metadata>
+	<trk>
+		<name>Вздовж_Сури_2</name>
+		<trkseg>
+			<trkpt lat="48.446126" lon="35.028300"><time>1970-01-01T00:00:01.000Z</time></trkpt>
+			<trkpt lat="48.445933" lon="35.028128"><time>1970-01-01T00:00:01.000Z</time></trkpt>
+			<trkpt lat="48.446105" lon="35.027721"><time>1970-01-01T00:00:01.000Z</time></trkpt>
+			...
+		</trkseg>
+	</trk>
+</gpx>
+```
 
 ## Choosing implementation tools
 
