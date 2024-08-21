@@ -130,12 +130,12 @@ export const OurGoogleMap: React.FC<MyMapProps> = ({locations, drawRoute, routeS
     alert('save');
   }
   
-  console.log(`Center location: ${center.location.lat},${center.location.lng}`);
-  
   return(<div className="flex-parent-div">
   <div className="map-div">
     <APIProvider apiKey={apiKey}>
-      <Map center={center.location}
+      <Map 
+        defaultCenter={center.location}
+        //center={center.location} comment out because if it exists I can't move the map
         defaultZoom={11} mapId='DEMO_MAP_ID' 
         disableDoubleClickZoom = {true} onDblclick={onDblclick}>
         <PointMarkers points={loc}/>
