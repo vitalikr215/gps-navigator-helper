@@ -4,7 +4,7 @@ import { MapPoint, Segment } from "../entities/MapPoint";
 import { MyMapProps } from "../props/MyMapProps";
 import { Polyline } from "./Polyline";
 import { ColorHelper } from "../helpers/ColorHelper";
-import { PointsHelper } from "../helpers/PointsHelper";
+import { GPXFilesNaming, PointsHelper } from "../helpers/PointsHelper";
 import { savePointsToGPX } from "../actions/actions";
 
 
@@ -126,8 +126,21 @@ export const OurGoogleMap: React.FC<MyMapProps> = ({locations, drawRoute, routeS
   }
 
   const savePoints = (event: any)=>{
-    savePointsToGPX(loc);
-    alert('save');
+    const newGpxFile =  savePointsToGPX(loc);
+    newGpxFile.then((gpxContent)=>{
+      const blob = new Blob([gpxContent], { type: 'application/gpx+xml' });
+      const url = URL.createObjectURL(blob);
+    
+      const link = document.createElement('a');
+      link.href = url;
+      link.download = PointsHelper.GetResultFilename(GPXFilesNaming.eTrex10);
+
+      document.body.appendChild(link);
+      link.click();
+
+      document.body.removeChild(link);
+      URL.revokeObjectURL(url);
+    });
   }
   
   return(<div className="flex-parent-div">

@@ -78,7 +78,7 @@ function fetchPointsFromFile(file: string): Promise<MyMapProps> {
     });
 }
 
-export function savePointsToGPX(points: MapPoint[]){
+export function savePointsToGPX(points: MapPoint[]):Promise<string>{
   return fetch('/testdata/boilerplate.gpx')
     .then(response => response.text())
     .then(text => {
@@ -86,6 +86,6 @@ export function savePointsToGPX(points: MapPoint[]){
       const doc = parser.parseFromString(text, "application/xml");
 
       const newXmlString = CoordinatesSaver.PrepareResultGPX(doc, points);
-      console.log(newXmlString);
+      return newXmlString;
     });
 }
