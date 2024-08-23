@@ -1,24 +1,16 @@
-import React, { useCallback, useEffect, useState } from "react";
+import React, { ChangeEvent, useCallback, useEffect, useRef, useState } from "react";
 import { APIProvider, AdvancedMarker, Map, MapMouseEvent } from "@vis.gl/react-google-maps";
 import { MapPoint, Segment } from "../entities/MapPoint";
 import { MyMapProps } from "../props/MyMapProps";
 import { Polyline } from "./Polyline";
 import { ColorHelper } from "../helpers/ColorHelper";
-import { PointsHelper } from "../helpers/PointsHelper";
+import { GPXFilesNaming, PointsHelper } from "../helpers/PointsHelper";
+import { savePointsToGPX } from "../actions/actions";
 
-function getCenter(points: MapPoint[]): MapPoint{
-  let position = Math.round(points.length/2)
-  if (position ==1){
-    return points[0];
-  }
-  else{
-    return points[position];
-  }
-}
 
 let idCounter =1;
 
-export const OurGoogleMap: React.FC<MyMapProps> = ({locations, drawRoute, routeSegments, newRoute})=>{
+export const OurGoogleMap: React.FC<MyMapProps> = ({locations, drawRoute, routeSegments, newRoute, center})=>{
 
   const [loc, setLocations] = useState<MapPoint[]>([]);
 
@@ -30,21 +22,6 @@ export const OurGoogleMap: React.FC<MyMapProps> = ({locations, drawRoute, routeS
       setLocations([]);
     }
   }, [locations]);
-
-  let defaultProps ={
-    center: {
-      lat: 48.47555614,
-      lng: 34.73800501
-    },
-    zoom: 11
-  };
-  
-  //calculate center coordinates based on existing points
-  if (locations.length>0){
-    const center = getCenter(locations);
-    defaultProps.center.lat = center.location.lat;
-    defaultProps.center.lng = center.location.lng;
-  }
 
   const apiKey = process.env.REACT_APP_GOOGLE_API_KEY;
 
@@ -83,11 +60,31 @@ export const OurGoogleMap: React.FC<MyMapProps> = ({locations, drawRoute, routeS
 
   //<button style={}><img src='/icons8-save-50.png'/></button>
   const PointsList = (props:{points: MapPoint[]})=>{    
+
+    const changePointNameAndUpdateState = (id: number) =>  (event: React.FocusEvent<HTMLInputElement>) => {
+      const newValue = event.target.value;
+      setLocations(prevPoints =>
+        prevPoints.map(point =>
+          point.id === id ? { ...point, key: newValue } : point
+        )
+      );
+    }
+    //local state for storing temp values for textbox
+    const [editingValue, setEditingValue] = useState<{ [id: number]: string }>({});
+
+    const handleChange = (id: number) => (event: ChangeEvent<HTMLInputElement>) => {
+      const newValue = event.target.value;
+      setEditingValue(prev => ({ ...prev, [id]: newValue }));
+    };
+
     return(
       <div className="flex-child-element">
-        <h4>
-          Route points:
-        </h4>
+        <div className="points-div">
+          <p>
+            Route points:
+          </p>
+          <button disabled={props.points.length==0} onClick={savePoints}><img src='/icons8-save-50.png'/></button>
+        </div>
         {
           props.points.map( (p: MapPoint) => (
             <div>
@@ -95,7 +92,9 @@ export const OurGoogleMap: React.FC<MyMapProps> = ({locations, drawRoute, routeS
               <button value={p.id} onClick={removePointFromRoute}>[ X ]</button>
             </div>
             <div>
-              <input className="point-name-input" readOnly type="text" value={p.key}></input>
+              <input className="point-name-input" onChange={handleChange(p.id)} onBlur={changePointNameAndUpdateState(p.id)}  type="text" 
+                value={ editingValue[p.id] || p.key || '' }>
+              </input>
               <p className="point-coord-text">{p.location.lat}, {p.location.lng}</p>
             </div>
             </div>
@@ -124,15 +123,33 @@ export const OurGoogleMap: React.FC<MyMapProps> = ({locations, drawRoute, routeS
     let idToRemove = Number(event.target.value)
     let updatedPoints = loc.filter(item => item.id !== idToRemove);
     setLocations(updatedPoints);
-    //console.log(loc.length);
   }
-  
+
+  const savePoints = (event: any)=>{
+    const newGpxFile =  savePointsToGPX(loc);
+    newGpxFile.then((gpxContent)=>{
+      const blob = new Blob([gpxContent], { type: 'application/gpx+xml' });
+      const url = URL.createObjectURL(blob);
+    
+      const link = document.createElement('a');
+      link.href = url;
+      link.download = PointsHelper.GetResultFilename(GPXFilesNaming.eTrex10);
+
+      document.body.appendChild(link);
+      link.click();
+
+      document.body.removeChild(link);
+      URL.revokeObjectURL(url);
+    });
+  }
   
   return(<div className="flex-parent-div">
   <div className="map-div">
     <APIProvider apiKey={apiKey}>
-      <Map defaultCenter={defaultProps.center}
-        defaultZoom={defaultProps.zoom} mapId='DEMO_MAP_ID' 
+      <Map 
+        defaultCenter={center.location}
+        //center={center.location} comment out because if it exists I can't move the map
+        defaultZoom={11} mapId='DEMO_MAP_ID' 
         disableDoubleClickZoom = {true} onDblclick={onDblclick}>
         <PointMarkers points={loc}/>
         <Polylines points={loc} segments={routeSegments}/>
